@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>Dynamic Quote Generator</title>
+</head>
+
+<body>
+    <h1>Dynamic Quote Generator</h1>
+
+    <!-- Quote Display Section -->
+    <div id="quoteDisplay"></div>
+
+    <!-- Show New Quote Button -->
+    <button id="newQuoteBtn" aria-label="Show a new random quote" onclick=" showRandomQuote()">
+      Show New Quote
+    </button>
+
+    <!-- Form to Add New Quotes -->
+    <div>
+        <label for="newQuoteText">Quote</label>
+        <input id="newQuoteText" type="text" placeholder="Enter a new quote" aria-label="Enter your new quote" />
+        <label for="newQuoteCategory">Category</label>
+        <input id="newQuoteCategory" type="text" placeholder="Enter quote category" aria-label="Enter category for the quote" />
+        <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+        <button id="addQuoteBtn" aria-label="Add your new quote">
+        Add Quote
+      </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

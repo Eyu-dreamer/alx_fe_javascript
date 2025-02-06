@@ -1,0 +1,33 @@
+#newQuoteText {
+    border: 3px solid black;
+    display: block;
+    margin: 10px;
+}
+
+#newQuoteCategory {
+    border: 3px solid black;
+    display: block;
+    margin: 10px;
+}
+
+label {
+    font-size: 1.5rem;
+    margin-top: 10px;
+}
+
+button {
+    font-size: 1.5rem;
+    margin: 10px 5px;
+}
+
+#quoteDisplay {
+    border: 2px solid black;
+    width: 250px;
+    height: 250px;
+    margin: 20px 5px;
+}
+
+#man {
+    border: 2px solid black;
+    height: 50%;
+}
