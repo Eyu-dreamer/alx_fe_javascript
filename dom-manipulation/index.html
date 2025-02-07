@@ -1,60 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Quote Generator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    h1 {
-      text-align: center;
-    }
-    #quoteDisplay {
-      margin: 20px 0;
-      padding: 10px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    button {
-      padding: 10px 15px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    input {
-      margin: 5px 0;
-      padding: 8px;
-      width: 95%;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
-    }
-    div {
-      margin: 10px 0;
-    }
-  </style>
-</head>
-<body>
-  <h1>Dynamic Quote Generator</h1>
-  <div id="quoteDisplay">
-    <!-- Random quotes will be displayed here -->
-    <p>Select a category or click "Show New Quote" to begin!</p>
-  </div>
-  <button id="newQuote">Show New Quote</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Quote Generator</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
 
-  <script src="script.js"></script>
-</body>
+  <body>
+    <h1>Dynamic Quote Generator</h1>
+    <div id="quoteDisplay">
+      <!-- Random quotes will be displayed here -->
+      <p>Select a category or click "Show New Quote" to begin!</p>
+    </div>
+
+    <button id="newQuote">Show New Quote</button>
+
+    <!-- File input for importing quotes -->
+    <input
+      type="file"
+      id="importFile"
+      accept=".json"
+      onchange="importFromJsonFile(event)"
+    />
+    <select id="categoryFilter" onchange="filterQuotes(event)">
+      <option value="all">All Categories</option>
+      <!-- Dynamically populated categories -->
+    </select>
+    <script src="script.js"></script>
+  </body>
 </html>

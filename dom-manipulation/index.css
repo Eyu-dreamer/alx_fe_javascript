@@ -1,33 +1,46 @@
-#newQuoteText {
-    border: 3px solid black;
-    display: block;
-    margin: 10px;
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f4;
 }
 
-#newQuoteCategory {
-    border: 3px solid black;
-    display: block;
-    margin: 10px;
-}
-
-label {
-    font-size: 1.5rem;
-    margin-top: 10px;
-}
-
-button {
-    font-size: 1.5rem;
-    margin: 10px 5px;
+h1 {
+  text-align: center;
 }
 
 #quoteDisplay {
-    border: 2px solid black;
-    width: 250px;
-    height: 250px;
-    margin: 20px 5px;
+  margin: 20px 0;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-#man {
-    border: 2px solid black;
-    height: 50%;
+button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+input {
+  margin: 5px 0;
+  padding: 8px;
+  width: 95%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+div {
+  margin: 10px 0;
 }
