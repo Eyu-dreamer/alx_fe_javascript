@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Quote Generator</title>
     <link rel="stylesheet" href="index.css" />
+    <!-- Keep the appropriate file name -->
   </head>
 
   <body>
     <h1>Dynamic Quote Generator</h1>
+
+    <!-- Category Filter Dropdown -->
+    <label for="categoryFilter">Select a Category:</label>
+    <select id="categoryFilter">
+      <option value="">--Select a category--</option>
+      <!-- Categories will be populated here -->
+    </select>
+
     <div id="quoteDisplay">
       <!-- Random quotes will be displayed here -->
       <p>Select a category or click "Show New Quote" to begin!</p>
@@ -23,10 +32,7 @@
       accept=".json"
       onchange="importFromJsonFile(event)"
     />
-    <select id="categoryFilter" onchange="filterQuotes(event)">
-      <option value="all">All Categories</option>
-      <!-- Dynamically populated categories -->
-    </select>
+
     <script src="script.js"></script>
   </body>
 </html>

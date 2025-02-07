@@ -32,7 +32,8 @@ button:hover {
   background-color: #0056b3;
 }
 
-input {
+input,
+select {
   margin: 5px 0;
   padding: 8px;
   width: 95%;
