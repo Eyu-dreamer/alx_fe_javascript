@@ -103,31 +103,6 @@ function createAddQuoteForm() {
 function saveQuotes() {
     localStorage.setItem("quotes", JSON.stringify(quotes));
 }
-// Function to periodically update the quotes saved in the local storage;// Array to hold quotes locally
-
-setInterval(() => {
-    fetch("https://api.api-ninjas.com/v1/quotes")
-        .then((resp) => resp.json())
-        .then((result) => {
-            // Destructure the quote and category from the API response
-            const { quote: text, category } = result;
-
-            // Retrieve existing quotes from localStorage
-            let storedQuotes = JSON.parse(localStorage.getItem("serverQuote")) || [];
-
-            // Add the new quote to the array
-            storedQuotes.push({ text, category });
-
-            // Update the localStorage with the new quotes array
-            localStorage.setItem("serverQuote", JSON.stringify(storedQuotes));
-
-            // Update the quotes array
-            quotes = [...storedQuotes];
-
-            console.log("Updated quotes:", quotes); // Optional: log to check the quotes
-        })
-        .catch((error) => console.error("Error fetching quotes:", error));
-}, 1000 * 60);
 
 // Function to add a new quote to the array and update the DOM
 function addQuote() {
@@ -200,3 +175,51 @@ btn.addEventListener("click", () => {
     link.click();
     link.remove();
 });
+// Function to periodically update the quotes saved in the local storage;
+
+//function fetchQuotesFromServer;
+const QUOTES_API = "https://api.api-ninjas.com/v1/quotes";
+
+// Function to fetch quotes from the server
+function fetchQuotesFromServer() {
+    fetch(QUOTES_API)
+        .then((resp) => resp.json())
+        .then((quotes) => {
+            console.log("Fetched quotes from the server:", quotes);
+            syncQuotes(quotes); // Sync quotes from server
+        })
+        .catch((error) => console.error("Error fetching quotes:", error));
+}
+
+// Periodically fetch quotes every minute
+setInterval(fetchQuotesFromServer, 1000 * 60); // 1000 * 60 = 1 minute
+
+// Sync quotes from the server to local storage
+function syncQuotes(serverQuotes) {
+    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+    // Resolve conflicts by merging and prioritizing server data
+    const mergedQuotes = [...serverQuotes, ...localQuotes];
+    const uniqueQuotes = mergedQuotes.filter(
+        (value, index, self) =>
+        index === self.findIndex((t) => t.text === value.text)
+    );
+
+    // Save unique quotes to local storage
+    localStorage.setItem("quotes", JSON.stringify(uniqueQuotes));
+
+    notifyUser("Quotes updated successfully!");
+}
+
+// Notify user of data updates
+function notifyUser(message) {
+    const notification = document.createElement("div");
+    notification.innerText = message;
+    notification.style.backgroundColor = "green";
+    notification.style.color = "white";
+    notification.style.padding = "10px";
+    notification.style.marginTop = "20px";
+    document.body.appendChild(notification);
+
+    setTimeout(() => notification.remove(), 5000);
+}
