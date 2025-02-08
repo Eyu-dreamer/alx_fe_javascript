@@ -176,39 +176,42 @@ btn.addEventListener("click", () => {
     link.remove();
 });
 // Function to periodically update the quotes saved in the local storage;
+// Use the JSONPlaceholder API for fetching posts (simulating quote data)
+const API_URL = "https://jsonplaceholder.typicode.com/posts";
 
-//function fetchQuotesFromServer;
-const QUOTES_API = "https://api.api-ninjas.com/v1/quotes";
+// Function to fetch posts (simulating quotes) using async/await
+async function fetchQuotesFromServer() {
+    try {
+        // Fetch quotes from the server
+        const response = await fetch(API_URL);  // Fetch the data from the server
+        const posts = await response.json();    // Parse the response as JSON
 
-// Function to fetch quotes from the server
-function fetchQuotesFromServer() {
-    fetch(QUOTES_API)
-        .then((resp) => resp.json())
-        .then((quotes) => {
-            console.log("Fetched quotes from the server:", quotes);
-            syncQuotes(quotes); // Sync quotes from server
-        })
-        .catch((error) => console.error("Error fetching quotes:", error));
+        console.log("Fetched posts from the server:", posts);
+        syncQuotes(posts);  // Sync quotes with local storage
+    } catch (error) {
+        console.error("Error fetching quotes:", error);
+    }
 }
 
 // Periodically fetch quotes every minute
 setInterval(fetchQuotesFromServer, 1000 * 60); // 1000 * 60 = 1 minute
 
 // Sync quotes from the server to local storage
-function syncQuotes(serverQuotes) {
-    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+function syncQuotes(serverPosts) {
+    const localPosts = JSON.parse(localStorage.getItem('posts')) || [];  // Get local posts
 
-    // Resolve conflicts by merging and prioritizing server data
-    const mergedQuotes = [...serverQuotes, ...localQuotes];
-    const uniqueQuotes = mergedQuotes.filter(
-        (value, index, self) =>
-        index === self.findIndex((t) => t.text === value.text)
+    // Resolve conflicts: Server data takes precedence over local data
+    const mergedPosts = [...serverPosts, ...localPosts];
+
+    // Remove duplicates based on the "id" (unique identifier for posts)
+    const uniquePosts = mergedPosts.filter((value, index, self) =>
+        index === self.findIndex((t) => t.id === value.id)
     );
 
-    // Save unique quotes to local storage
-    localStorage.setItem("quotes", JSON.stringify(uniqueQuotes));
+    // Save merged and unique posts back to local storage
+    localStorage.setItem('posts', JSON.stringify(uniquePosts));
 
-    notifyUser("Quotes updated successfully!");
+    notifyUser("Posts updated successfully!");  // Notify user of update
 }
 
 // Notify user of data updates
@@ -220,6 +223,6 @@ function notifyUser(message) {
     notification.style.padding = "10px";
     notification.style.marginTop = "20px";
     document.body.appendChild(notification);
-
-    setTimeout(() => notification.remove(), 5000);
+    
+    setTimeout(() => notification.remove(), 5000);  // Remove notification after 5 seconds
 }
