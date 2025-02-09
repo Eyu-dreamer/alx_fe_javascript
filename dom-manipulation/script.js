@@ -142,7 +142,7 @@ function syncQuotes(serverQuotes) {
     localStorage.setItem("quotes", JSON.stringify(uniqueQuotes));
 
     // Notify user about sync
-    notifyUser("Quotes successfully synced with server!", "success");
+    notifyUser("Quotes successfully synced with the server!", "success");
 }
 
 // Function to post new quotes to the server using a mock API
