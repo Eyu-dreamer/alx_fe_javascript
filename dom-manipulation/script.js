@@ -102,7 +102,7 @@ function addQuote() {
     const newQuoteCategory = document.getElementById("newQuoteCategory").value.trim();
 
     if (newQuoteText === "" || newQuoteCategory === "") {
-        alert("Please fill in both fields!");
+        notifyUser("Please fill in both fields!", "error");
         return;
     }
 
@@ -112,7 +112,7 @@ function addQuote() {
     document.getElementById("newQuoteCategory").value = "";
 
     saveQuotes();
-    alert("New quote added successfully!");
+    notifyUser("New quote added successfully!", "success");
 }
 
 // Function to fetch quotes from the server using a mock API
@@ -126,6 +126,7 @@ async function fetchQuotesFromServer() {
         syncQuotes(serverQuotes);
     } catch (error) {
         console.error("Error fetching quotes:", error);
+        notifyUser("Failed to fetch quotes from the server!", "error");
     }
 }
 
@@ -139,7 +140,9 @@ function syncQuotes(serverQuotes) {
     );
 
     localStorage.setItem("quotes", JSON.stringify(uniqueQuotes));
-    notifyUser("Quotes updated successfully!");
+
+    // Notify user about sync
+    notifyUser("Quotes successfully synced with server!", "success");
 }
 
 // Function to post new quotes to the server using a mock API
@@ -155,20 +158,26 @@ async function postQuoteToServer(quote) {
 
         if (response.ok) {
             console.log("Quote posted successfully:", await response.json());
+            notifyUser("Quote posted successfully!", "success");
         }
     } catch (error) {
         console.error("Error posting quote:", error);
+        notifyUser("Failed to post quote to server!", "error");
     }
 }
 
-// Function to notify the user about updates
-function notifyUser(message) {
+// Function to notify the user about updates or conflicts
+function notifyUser(message, type) {
     const notification = document.createElement("div");
     notification.innerText = message;
-    notification.style.backgroundColor = "green";
+    notification.style.backgroundColor = type === "success" ? "green" : "red";
     notification.style.color = "white";
     notification.style.padding = "10px";
     notification.style.marginTop = "20px";
+    notification.style.borderRadius = "5px";
+    notification.style.fontFamily = "Arial, sans-serif";
+    notification.style.fontSize = "14px";
+
     document.body.appendChild(notification);
 
     setTimeout(() => notification.remove(), 5000);
