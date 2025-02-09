@@ -1,17 +1,8 @@
 // Default quotes (if nothing is in localStorage)
 const defaultQuotes = [
-    {
-        text: "The only way to do great work is to love what you do.",
-        category: "Motivation",
-    },
-    {
-        text: "Success is not final; failure is not fatal: It is the courage to continue that counts.",
-        category: "Success",
-    },
-    { 
-        text: "In the middle of every difficulty lies opportunity.",
-        category: "Life",
-    },
+    { text: "The only way to do great work is to love what you do.", category: "Motivation" },
+    { text: "Success is not final; failure is not fatal: It is the courage to continue that counts.", category: "Success" },
+    { text: "In the middle of every difficulty lies opportunity.", category: "Life" },
 ];
 
 // Load quotes from localStorage, or use default if none are saved
@@ -28,6 +19,7 @@ function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
     const randomQuote = filteredQuotes[randomIndex];
     sessionStorage.setItem("lastViewedQuote", JSON.stringify(randomQuote)); // Save last viewed quote to sessionStorage
+
     // Update DOM with the quote
     const quoteDisplay = document.getElementById("quoteDisplay");
     quoteDisplay.innerHTML = `
@@ -71,7 +63,6 @@ function filterQuotesByCategory(event) {
 
 // Function to dynamically create the "Add Quote" form
 function createAddQuoteForm() {
-    // Create a container div
     const formContainer = document.createElement("div");
 
     // Create input for new quote text
@@ -89,7 +80,7 @@ function createAddQuoteForm() {
     // Create a button to add a new quote
     const addButton = document.createElement("button");
     addButton.textContent = "Add Quote";
-    addButton.addEventListener("click", () => addQuoteAndPostToServer());
+    addButton.addEventListener("click", addQuote);
 
     // Append inputs and button to the container
     formContainer.appendChild(quoteInput);
@@ -108,33 +99,51 @@ function saveQuotes() {
 // Function to add a new quote to the array and update the DOM
 function addQuote() {
     const newQuoteText = document.getElementById("newQuoteText").value.trim();
-    const newQuoteCategory = document
-        .getElementById("newQuoteCategory")
-        .value.trim();
+    const newQuoteCategory = document.getElementById("newQuoteCategory").value.trim();
 
     if (newQuoteText === "" || newQuoteCategory === "") {
         alert("Please fill in both fields!");
         return;
     }
 
-    // Add the new quote to the quotes array
-    const newQuote = { text: newQuoteText, category: newQuoteCategory };
-    quotes.push(newQuote);
+    quotes.push({ text: newQuoteText, category: newQuoteCategory });
 
-    // Clear input fields
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
 
-    // Save quotes array into localStorage
     saveQuotes();
     alert("New quote added successfully!");
-    return newQuote;
 }
 
-// Function to post a new quote to the server
-async function postQuoteToServer(quote) {
-    const API_URL = "https://jsonplaceholder.typicode.com/posts"; // Simulating server API
+// Function to fetch quotes from the server using a mock API
+const API_URL = "https://jsonplaceholder.typicode.com/posts"; // Mock API URL
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(API_URL);
+        const serverQuotes = await response.json();
 
+        // Process and sync quotes with localStorage
+        syncQuotes(serverQuotes);
+    } catch (error) {
+        console.error("Error fetching quotes:", error);
+    }
+}
+
+// Function to sync quotes with server data and handle conflicts
+function syncQuotes(serverQuotes) {
+    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+    const mergedQuotes = [...serverQuotes, ...localQuotes];
+
+    const uniqueQuotes = mergedQuotes.filter((quote, index, self) =>
+        index === self.findIndex((q) => q.text === quote.text)
+    );
+
+    localStorage.setItem("quotes", JSON.stringify(uniqueQuotes));
+    notifyUser("Quotes updated successfully!");
+}
+
+// Function to post new quotes to the server using a mock API
+async function postQuoteToServer(quote) {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
@@ -145,35 +154,36 @@ async function postQuoteToServer(quote) {
         });
 
         if (response.ok) {
-            const result = await response.json();
-            console.log("Quote successfully posted to the server:", result);
-            alert("Quote successfully posted to the server!");
-        } else {
-            console.error("Failed to post quote to server:", response.statusText);
+            console.log("Quote posted successfully:", await response.json());
         }
     } catch (error) {
-        console.error("Error posting quote to server:", error);
+        console.error("Error posting quote:", error);
     }
 }
 
-// Combined function to add a quote and post it to the server
-function addQuoteAndPostToServer() {
-    const newQuote = addQuote();
-    if (newQuote) {
-        postQuoteToServer(newQuote);
-    }
+// Function to notify the user about updates
+function notifyUser(message) {
+    const notification = document.createElement("div");
+    notification.innerText = message;
+    notification.style.backgroundColor = "green";
+    notification.style.color = "white";
+    notification.style.padding = "10px";
+    notification.style.marginTop = "20px";
+    document.body.appendChild(notification);
+
+    setTimeout(() => notification.remove(), 5000);
 }
 
-// Attach event listener to the "Show New Quote" button
+// Periodically fetch and update quotes every minute
+setInterval(fetchQuotesFromServer, 60000); // 60 seconds
+
+// Attach event listener to "Show New Quote" button
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 
-// Attach event listener to the category filter dropdown
-document
-    .getElementById("categoryFilter")
-    .addEventListener("change", filterQuotesByCategory);
+// Attach event listener to category filter dropdown
+document.getElementById("categoryFilter").addEventListener("change", filterQuotesByCategory);
 
-// Dynamically create and add the "Add Quote" form to the page
+// Initialize the app
 createAddQuoteForm();
-
-// Populate categories dropdown on page load
 populateCategories();
+fetchQuotesFromServer();
