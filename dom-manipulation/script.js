@@ -1,4 +1,4 @@
-// Initial array of quotes (if nothing is in localStorage)
+// Default quotes (if nothing is in localStorage)
 const defaultQuotes = [{
         text: "The only way to do great work is to love what you do.",
         category: "Motivation",
@@ -141,77 +141,33 @@ createAddQuoteForm();
 // Populate categories dropdown on page load
 populateCategories();
 
-// Import JSON file containing quotes
-function importFromJsonFile(event) {
-    const fileReader = new FileReader();
-    fileReader.onload = function(event) {
-        const importedQuotes = JSON.parse(event.target.result);
-        quotes.push(...importedQuotes); // Add the imported quotes to the existing array
-        saveQuotes(); // Save to localStorage
-        alert("Quotes imported successfully!");
-        populateCategories(); // Re-populate categories after importing new quotes
-    };
-    fileReader.readAsText(event.target.files[0]);
-}
-
-// Export quotes to JSON file
-let btn = document.createElement("button");
-btn.textContent = "Download Quotes as a Json File";
-document.body.appendChild(btn);
-
-btn.addEventListener("click", () => {
-    // Create a JSON string from the quotes array
-    let jsonQuotes = JSON.stringify(quotes, null, 2); // Pretty-print with indentation
-    let blob = new Blob([jsonQuotes], { type: "application/json" });
-    let url = URL.createObjectURL(blob);
-
-    // Create a link for download
-    let link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "Quotes.json");
-
-    // Programmatically click and then remove the link
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-});
-// Function to periodically update the quotes saved in the local storage;
-// Use the JSONPlaceholder API for fetching posts (simulating quote data)
-const API_URL = "https://jsonplaceholder.typicode.com/posts";
+// Initial setup for conflict resolution and syncing quotes
+const API_URL = "https://jsonplaceholder.typicode.com/posts"; // Simulating server API
 
 // Function to fetch posts (simulating quotes) using async/await
 async function fetchQuotesFromServer() {
     try {
-        // Fetch quotes from the server
-        const response = await fetch(API_URL);  // Fetch the data from the server
-        const posts = await response.json();    // Parse the response as JSON
-
-        console.log("Fetched posts from the server:", posts);
+        const response = await fetch(API_URL);
+        const posts = await response.json();
         syncQuotes(posts);  // Sync quotes with local storage
     } catch (error) {
         console.error("Error fetching quotes:", error);
     }
 }
 
-// Periodically fetch quotes every minute
-setInterval(fetchQuotesFromServer, 1000 * 60); // 1000 * 60 = 1 minute
-
 // Sync quotes from the server to local storage
 function syncQuotes(serverPosts) {
-    const localPosts = JSON.parse(localStorage.getItem('posts')) || [];  // Get local posts
-
+    const localPosts = JSON.parse(localStorage.getItem('posts')) || [];
+    
     // Resolve conflicts: Server data takes precedence over local data
     const mergedPosts = [...serverPosts, ...localPosts];
-
-    // Remove duplicates based on the "id" (unique identifier for posts)
     const uniquePosts = mergedPosts.filter((value, index, self) =>
         index === self.findIndex((t) => t.id === value.id)
     );
-
+    
     // Save merged and unique posts back to local storage
     localStorage.setItem('posts', JSON.stringify(uniquePosts));
-
-    notifyUser("Posts updated successfully!");  // Notify user of update
+    notifyUser("Posts updated successfully!");
 }
 
 // Notify user of data updates
@@ -224,5 +180,36 @@ function notifyUser(message) {
     notification.style.marginTop = "20px";
     document.body.appendChild(notification);
     
-    setTimeout(() => notification.remove(), 5000);  // Remove notification after 5 seconds
+    setTimeout(() => notification.remove(), 5000);
 }
+
+// Function to update local quotes with conflict resolution
+function updateLocalQuote(quote) {
+    let quotes = JSON.parse(localStorage.getItem('quotes')) || [];
+
+    const existingQuoteIndex = quotes.findIndex(q => q.text === quote.text);
+
+    if (existingQuoteIndex !== -1) {
+        // Conflict resolution: If the quote exists, update it from the server
+        quotes[existingQuoteIndex] = quote;
+        showConflictNotification('Quote updated from server.');
+    } else {
+        quotes.push(quote); // Add the new quote if it doesn't exist
+    }
+
+    localStorage.setItem('quotes', JSON.stringify(quotes));
+}
+
+// Function to show conflict notification
+function showConflictNotification(message) {
+    const notification = document.createElement('div');
+    notification.classList.add('conflict-notification');
+    notification.innerHTML = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// Periodically fetch and update quotes every minute (60000ms)
+setInterval(fetchQuotesFromServer, 1000 * 60); // Every 60 seconds (1 minute)
+
